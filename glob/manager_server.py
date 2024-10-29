@@ -16,6 +16,20 @@ from server import PromptServer
 import manager_core as core
 import cm_global
 
+def url_mirror(url):
+    
+    if os.environ['CHINA'].lower() == "true" or int(os.environ['CHINA']) == 1:
+        if 'github.com' in url:
+            if os.environ['GITHUB_MIRROR']:
+                github_mirror = os.environ['GITHUB_MIRROR']
+            else:
+                github_mirror = "https://ghp.ci/"
+            return github_mirror + url
+        elif 'huggingface.co' in url:
+            return url.replace('huggingface.co', 'hf-mirror.com')
+        else:
+            return url
+
 print(f"### Loading: ComfyUI-Manager ({core.version_str})")
 
 comfy_ui_hash = "-"
@@ -1047,6 +1061,7 @@ async def install_model(request):
             if not core.get_config()['model_download_by_agent'] and (
                     model_url.startswith('https://github.com') or model_url.startswith('https://huggingface.co') or model_url.startswith('https://heibox.uni-heidelberg.de')):
                 model_dir = get_model_dir(json_data)
+                model_url = url_mirror(model_url)
                 download_url(model_url, model_dir, filename=json_data['filename'])
                 if model_path.endswith('.zip'):
                     res = core.unzip(model_path)

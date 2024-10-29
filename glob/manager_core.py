@@ -17,6 +17,17 @@ import time
 import yaml
 import zipfile
 
+def github_mirror(url):
+    if 'github.com' in url:
+        if os.environ['CHINA'].lower() == "true" or int(os.environ['CHINA']) == 1:
+            if os.environ['GITHUB_MIRROR']:
+                github_mirror = os.environ['GITHUB_MIRROR']
+            else:
+                github_mirror = "https://ghp.ci/"
+            return github_mirror + url
+    else:
+        return url
+
 glob_path = os.path.join(os.path.dirname(__file__))  # ComfyUI-Manager/glob
 sys.path.append(glob_path)
 
@@ -557,6 +568,7 @@ def gitclone_install(files, instant_execution=False, msg_prefix=''):
         if url.endswith("/"):
             url = url[:-1]
         try:
+            url = github_mirror(url)
             print(f"Download: git clone '{url}'")
             repo_name = os.path.splitext(os.path.basename(url))[0]
             repo_path = os.path.join(custom_nodes_path, repo_name)
@@ -697,6 +709,7 @@ def gitclone_fix(files, instant_execution=False):
         if url.endswith("/"):
             url = url[:-1]
         try:
+            url = github_mirror(url)
             repo_name = os.path.splitext(os.path.basename(url))[0]
             repo_path = os.path.join(custom_nodes_path, repo_name)
 
@@ -750,6 +763,7 @@ def gitclone_uninstall(files):
         if url.endswith("/"):
             url = url[:-1]
         try:
+            url = github_mirror(url)
             dir_name = os.path.splitext(os.path.basename(url))[0].replace(".git", "")
             dir_path = os.path.join(custom_nodes_path, dir_name)
 
@@ -797,6 +811,7 @@ def gitclone_set_active(files, is_disable):
         if url.endswith("/"):
             url = url[:-1]
         try:
+            url = github_mirror(url)
             dir_name = os.path.splitext(os.path.basename(url))[0].replace(".git", "")
             dir_path = os.path.join(custom_nodes_path, dir_name)
 
@@ -839,6 +854,7 @@ def gitclone_update(files, instant_execution=False, skip_script=False, msg_prefi
         if url.endswith("/"):
             url = url[:-1]
         try:
+            url = github_mirror(url)
             repo_name = os.path.splitext(os.path.basename(url))[0].replace(".git", "")
             repo_path = os.path.join(custom_nodes_path, repo_name)
 
@@ -944,6 +960,8 @@ def check_a_custom_node_installed(item, do_fetch=False, do_update_check=True, do
         if url.endswith("/"):
             url = url[:-1]
 
+        url = github_mirror(url)
+
         dir_name = os.path.splitext(os.path.basename(url))[0].replace(".git", "")
         dir_path = os.path.join(custom_nodes_path, dir_name)
         if os.path.exists(dir_path):
@@ -1041,6 +1059,7 @@ def get_current_snapshot():
                 repo = git.Repo(fullpath)
                 commit_hash = repo.head.commit.hexsha
                 url = repo.remotes.origin.url
+                url = github_mirror(url)
                 git_custom_nodes[url] = {
                     'hash': commit_hash,
                     'disabled': is_disabled
