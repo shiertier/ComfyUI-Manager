@@ -18,15 +18,20 @@ import yaml
 import zipfile
 
 def github_mirror(url):
-    if 'github.com' or 'raw.githubusercontent.com' in url:
-        if os.environ['CHINA'].lower() == "true" or int(os.environ['CHINA']) == 1:
-            if os.environ['GITHUB_MIRROR']:
-                github_mirror = os.environ['GITHUB_MIRROR']
-            else:
-                github_mirror = "https://ghp.ci/"
+    # Check if the CHINA environment variable is set correctly
+    china_env = os.environ.get('CHINA', 'false').lower()
+    if china_env == "true" or china_env == "1":
+        # Check if the URL contains 'github.com' or 'raw.githubusercontent.com'
+        if 'github.com' in url or 'raw.githubusercontent.com' in url:
+            # Fetch the GITHUB_MIRROR environment variable or use the default
+            github_mirror = os.environ.get('GITHUB_MIRROR', 'https://ghp.ci/')
             return github_mirror + url
-    else:
-        return url
+        elif 'huggingface.co' in url:
+            return url.replace('huggingface.co', 'hf-mirror.com')
+        else:
+            return url
+    return url  # Return the original URL if the condition was not met
+
 
 glob_path = os.path.join(os.path.dirname(__file__))  # ComfyUI-Manager/glob
 sys.path.append(glob_path)
