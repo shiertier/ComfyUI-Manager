@@ -18,7 +18,7 @@ import yaml
 import zipfile
 
 def github_mirror(url):
-    if 'github.com' in url:
+    if 'github.com' or 'raw.githubusercontent.com' in url:
         if os.environ['CHINA'].lower() == "true" or int(os.environ['CHINA']) == 1:
             if os.environ['GITHUB_MIRROR']:
                 github_mirror = os.environ['GITHUB_MIRROR']

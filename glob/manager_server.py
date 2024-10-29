@@ -1358,6 +1358,8 @@ import asyncio
 async def default_cache_update():
     async def get_cache(filename):
         uri = 'https://raw.githubusercontent.com/ltdrdata/ComfyUI-Manager/main/' + filename
+        from .manager_core import github_mirror
+        uri = github_mirror(uri)
         cache_uri = str(core.simple_hash(uri)) + '_' + filename
         cache_uri = os.path.join(core.cache_dir, cache_uri)
 
